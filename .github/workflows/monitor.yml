@@ -1,0 +1,47 @@
+name: Monitor
+
+# Lo dispara cron-job.org cada 2 minutos con modo "revisar".
+# A mano: Run workflow con "reporte" o "reporte AAAA-MM-DD".
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "revisar, reporte o reporte AAAA-MM-DD"
+        default: "reporte"
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  correr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q requests
+      - name: Recuperar estado
+        uses: actions/cache/restore@v4
+        with:
+          path: estado
+          key: estado-${{ github.run_id }}
+          restore-keys: estado-
+      - name: Ejecutar
+        env:
+          NS_URL: ${{ secrets.NS_URL }}
+          NS_TOKEN: ${{ secrets.NS_TOKEN }}
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          NOMBRE: ${{ secrets.NOMBRE }}
+          ESTADO: estado/estado.json
+          MODO: ${{ github.event.inputs.modo }}
+        run: python monitor.py "$MODO"
+      - name: Guardar estado
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: estado
+          key: estado-${{ github.run_id }}
