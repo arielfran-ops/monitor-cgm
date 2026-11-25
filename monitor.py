@@ -23,7 +23,7 @@ ARG = timezone(timedelta(hours=-3))  # Argentina, sin horario de verano
 
 # ----- Reglas (cambialas aca) -----
 ALTO = 180                  # mg/dL
-MINUTOS_ALTO = 60           # tiempo continuo por encima de ALTO para avisar
+MINUTOS_ALTO = 30           # tiempo continuo por encima de ALTO para avisar
 UMBRAL_BAJADA = 150         # mg/dL: con flecha de bajada rapida -> aviso
 HIPO = 70                   # mg/dL: por debajo, aviso siempre
 MINUTOS_SIN_DATOS = 30      # sensor sin datos
